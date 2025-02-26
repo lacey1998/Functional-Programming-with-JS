@@ -99,6 +99,12 @@ The project now includes a **Pin Feature** that lets users pin a specific listin
 - **Print Pinned Listings**: Displays only the listings that have been pinned.
 This feature enhances the user experience by allowing you to prioritize and quickly view listings of interest.
 
+## Youtube Video
+- https://youtu.be/4Q8JPWyHrZQ
+
+## 📜 License
+This project is licensed under the **MIT License**.
+
 ## Use of Generative AI in Development
 This project was developed with the assistance of generative AI (ChatGPT, Model: GPT-4). Below are the details of how AI contributed to the project:
 
