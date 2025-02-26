@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node main.js",
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
+    "docs": "jsdoc -c jsdoc.json"  
   },
   "keywords": [],
   "author": "YuxinLiang",
@@ -25,6 +25,7 @@
     "prettier": "^3.4.2"
   },
   "dependencies": {
-    "csv-parse": "^5.6.0"
+    "csv-parse": "^5.6.0",
+    "jsdoc": "^4.0.4"
   }
 }
