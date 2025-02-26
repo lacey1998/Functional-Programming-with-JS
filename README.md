@@ -62,7 +62,7 @@ cd Functional-Programming-with-JS
 npm install
 npm install csv-parse
 
-#Obtain a Listings File
+# Obtain a Listings File
 - You can use the listings.csv file included in this repository, or
 - You can download another CSV file from the [AirBnB Get the Data page](https://insideairbnb.com/get-the-data/) (e.g., SF Dic 2024).
 ```

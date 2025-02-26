@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: AirBnBDataHandler.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: AirBnBDataHandler.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * AirBnBDataHandler module.
  * Provides functions to load and process Airbnb listings data.
  * Assumes CSV headers: id, price, bedrooms, review_scores_rating, host_id, etc.
@@ -13,7 +41,7 @@ import { parse } from 'csv-parse/sync';
  * This robust parser correctly handles quoted fields and commas within fields.
  *
  * @param {string} csvData - The CSV data as a string.
- * @returns {Array<Object>} - Array of objects representing each row.
+ * @returns {Array&lt;Object>} - Array of objects representing each row.
  */
 function parseCSV(csvData) {
   return parse(csvData, {
@@ -25,7 +53,7 @@ function parseCSV(csvData) {
 /**
  * Converts an array of objects to a CSV formatted string.
  *
- * @param {Array<Object>} data - Array of objects to convert.
+ * @param {Array&lt;Object>} data - Array of objects to convert.
  * @returns {string} - CSV formatted string.
  */
 function convertToCSV(data) {
@@ -55,12 +83,12 @@ function convertToCSV(data) {
  * Creates a new AirBnBDataHandler instance.
  * This instance supports method chaining for filtering, computations, and pinning listings.
  *
- * @param {Array<Object>} listings - Array of listing objects.
+ * @param {Array&lt;Object>} listings - Array of listing objects.
  * @returns {Object} - The handler instance.
  */
 function createHandler(listings) {
   let data = listings; // current working set of listings
-  let pinnedIds = new Set(); // array to store pinned listing ids
+  let pinnedIds = [];  // array to store pinned listing ids
 
   return {
     /**
@@ -76,18 +104,16 @@ function createHandler(listings) {
       data = data.filter(listing => {
         let valid = true;
         if (criteria.priceRange) {
-          // Clean the price field by removing non-numeric characters
-          const cleanedPrice = String(listing.price).replace(/[^0-9.]/g, '');
-          const price = parseFloat(cleanedPrice);
-          valid = valid && price >= criteria.priceRange[0] && price <= criteria.priceRange[1];
+          const price = parseFloat(listing.price);
+          valid = valid &amp;&amp; price >= criteria.priceRange[0] &amp;&amp; price &lt;= criteria.priceRange[1];
         }
         if (criteria.rooms) {
           const rooms = parseInt(listing.bedrooms) || 0;
-          valid = valid && rooms >= criteria.rooms;
+          valid = valid &amp;&amp; rooms >= criteria.rooms;
         }
         if (criteria.reviewScore) {
           const score = parseFloat(listing.review_scores_rating) || 0;
-          valid = valid && score >= criteria.reviewScore;
+          valid = valid &amp;&amp; score >= criteria.reviewScore;
         }
         return valid;
       });
@@ -102,11 +128,7 @@ function createHandler(listings) {
      */
     computeStats() {
       const count = data.length;
-      const totalPrice = data.reduce((sum, listing) => {
-        // Remove any non-numeric characters (like '$' or commas) from the price string
-        const cleanedPrice = String(listing.price).replace(/[^0-9.]/g, '');
-        return sum + (parseFloat(cleanedPrice) || 0);
-      }, 0);
+      const totalPrice = data.reduce((sum, listing) => sum + (parseFloat(listing.price) || 0), 0);
       const totalBedrooms = data.reduce((sum, listing) => sum + (parseInt(listing.bedrooms) || 0), 0);
       const avgPricePerBedroom = totalBedrooms ? totalPrice / totalBedrooms : 0;
       this.stats = { count, avgPricePerBedroom };
@@ -137,25 +159,26 @@ function createHandler(listings) {
      * @returns {Object} - The handler instance for chaining.
      */
     pinListing(listingId) {
-      const id = String(listingId); // Ensure the ID is stored as a string
-      pinnedIds.add(id); // Add the ID to the Set
+      if (!pinnedIds.includes(listingId)) {
+        pinnedIds.push(listingId);
+      }
       return this;
     },
 
     /**
      * Returns only the pinned listings.
      *
-     * @returns {Array<Object>} - Array of pinned listing objects.
+     * @returns {Array&lt;Object>} - Array of pinned listing objects.
      */
     getPinnedListings() {
-      return data.filter(listing => pinnedIds.has(String(listing.id)));
+      return data.filter(listing => listing.id &amp;&amp; pinnedIds.includes(listing.id));
     },
 
     /**
      * Exports the current filtered listings to a CSV file.
      *
      * @param {string} fileName - The name of the file to export results to.
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     exportResults(fileName) {
       // Export the filtered listings with pinned listings on top.
@@ -166,12 +189,12 @@ function createHandler(listings) {
     /**
      * Returns the current filtered listings with pinned listings appearing at the top.
      *
-     * @returns {Array<Object>}
+     * @returns {Array&lt;Object>}
      */
     getData() {
       if (pinnedIds.length > 0) {
-        const pinnedListings = data.filter(listing => pinnedIds.includes(String(listing.id)));
-        const nonPinnedListings = data.filter(listing => !pinnedIds.includes(String(listing.id)));
+        const pinnedListings = data.filter(listing => listing.id &amp;&amp; pinnedIds.includes(listing.id));
+        const nonPinnedListings = data.filter(listing => !listing.id || !pinnedIds.includes(listing.id));
         return [...pinnedListings, ...nonPinnedListings];
       }
       return data;
@@ -183,16 +206,12 @@ function createHandler(listings) {
  * Loads CSV data from the specified file and creates a handler.
  *
  * @param {string} filePath - Path to the CSV file.
- * @returns {Promise<Object>} - A promise that resolves to an AirBnBDataHandler instance.
+ * @returns {Promise&lt;Object>} - A promise that resolves to an AirBnBDataHandler instance.
  */
 async function loadData(filePath) {
   try {
     const csvData = await fs.readFile(filePath, { encoding: 'utf8' });
     const listings = parseCSV(csvData);
-
-    // Log the first 5 rows to check what my data looks like, for debugging 
-    //console.log('Sample parsed rows:', listings.slice(0, 5));
-
     return createHandler(listings);
   } catch (err) {
     console.error('Error reading file:', err);
@@ -202,3 +221,26 @@ async function loadData(filePath) {
 
 export { loadData, createHandler, parseCSV };
 export const AirBnBDataHandler = { loadData, createHandler, parseCSV };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AirBnBDataHandler.html">AirBnBDataHandler</a></li><li><a href="module-UI.html">UI</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Feb 26 2025 13:23:31 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
